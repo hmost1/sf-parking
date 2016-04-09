@@ -1,0 +1,14 @@
+<header>
+  <h1>Sweeping Routes</h1>
+</header>
+
+<form class="address-query" ng-submit="$ctrl.addressQuery($ctrl.number,$ctrl.street)">
+    <input ng-model="$ctrl.number" type="text" name="number" placeholder="house number"/>
+    <input ng-model="$ctrl.street" type="text" name="street" placeholder="house street"/>
+    <input style='width:0; visibility:hidden' type='submit'>
+ </form>
+
+ <li ng-repeat="item in $ctrl.routes">
+ 	<p> {{item.streetname}} between {{item.from_st}} and {{item.to_st}} ({{item.cnn}})</p>
+    <p>{{item.blockside}} side, {{item.fromhour}} to {{item.tohour}}</p>
+</li>
