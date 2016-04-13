@@ -1,0 +1,1 @@
+Routes = new Mongo.Collection('Routes');

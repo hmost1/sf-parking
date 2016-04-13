@@ -1,17 +1,32 @@
 import angular from 'angular';
 import angularMeteor from 'angular-meteor';
-import template from './sfParking.html';
-import { Routes } from '../../api/routes.js';
+//import { Routes } from '../../api/routes.js';
+import Calendar from '../calendar/calendar';
+//import Calendar from calendar;
 
-class SFParkingCtrl {
-  constructor($scope) {
-    $scope.viewModel(this);
+import './sfParking.html';
+
+class SFParking{
+  constructor($scope,$reactive) {
+    'ngInject';
+ 
+    //$scope.viewModel(this);
+    $reactive(this).attach($scope);
 
     this.helpers({
       routes() {
         return Routes.find(this.getReactively('routeQuery'));
+      }, 
+      d3Calender(){
+        console.log('drawing the d3 calendar');
       }
     })
+  }
+
+  show(value){
+    return value;
+    //Calendar.rest();
+    //console.log("hi hi hi");
   }
 
   addressQuery(number, street) {
@@ -38,15 +53,45 @@ class SFParkingCtrl {
     var addressQuery = numberQuery;
     addressQuery.streetname =  {$regex: ".*"+str+".*", $options: 'i'}; 
     addressQuery.cnnrightle = {$regex: rightLeft}
-
+    //console.log(addressQuery);
     this.routeQuery = addressQuery; 
-  };
+  }
+
+  blockQuery(block, cross1, cross2){        
+    b = block;
+    c1 = cross1; 
+    c2 = cross2;
+
+    this.block = '';
+    this.cross1 = '';
+    this.cross2 = '';
+
+    console.log("Looking up details for  " + b + " between " + c1 + " and " + c2)
+    //var blockQuery = 
+    //tODO: this works, should maybe reorg
+    //TODO: fix indexing in mongo so this goes faster
+    //TODO: there are literally circular streets in sf (ex: Urbano drive)
+    //TODO: also some streets use "end" (ex: urbano to end on corona )
+    var blockQuery=
+    {$and:
+      [
+        {$or:[{from_st:{$regex: ".*"+c1+".*", $options: 'i'}},{from_st:{$regex: ".*"+c2+".*", $options: 'i'}}]},
+        {$or:[{to_st:{$regex: ".*"+c1+".*", $options: 'i'}},{to_st:{$regex: ".*"+c2+".*", $options: 'i'}}]},
+        {streetname: {$regex: ".*"+b+".*", $options: 'i'}}
+      ]
+    };
+    
+    this.routeQuery = blockQuery; 
+  } 
 }
+
+const name = 'sfParking';
  
-export default angular.module('sfParking', [
-  angularMeteor
-])
-  .component('sfParking', {
+export default angular.module(name, [
+  angularMeteor,
+  Calendar.name
+]).component(name, {
     templateUrl: 'imports/components/sfParking/sfParking.html',
-    controller: ['$scope', SFParkingCtrl]
-  });
+    controllerAs: name, 
+    controller: SFParking
+});
